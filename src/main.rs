@@ -11,11 +11,17 @@ fn run(filename: &str) -> Result<(), ImageError> {
     let (width, height) = img.dimensions();
     println!("{}: {}x{} px", filename, width, height);
     let mut red_histogram = vec![0; 256];
+    let mut green_histogram = vec![0; 256];
+    let mut blue_histogram = vec![0; 256];
     for (_, _, pixel) in img.pixels() {
-        let (r, _, _, _) = pixel.channels4();
+        let (r, g, b, _) = pixel.channels4();
         red_histogram[r as usize] += 1;
+        green_histogram[g as usize] += 1;
+        blue_histogram[b as usize] += 1;
     }
     plot_histogram(&red_histogram);
+    plot_histogram(&green_histogram);
+    plot_histogram(&blue_histogram);
     Ok(())
 }
 
