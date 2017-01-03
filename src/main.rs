@@ -1,6 +1,8 @@
 extern crate image;
+extern crate itertools;
 
 use image::{GenericImage, ImageError, Pixel};
+use itertools::Itertools;
 
 const HISTOGRAM_HEIGHT: i32 = 16;
 
@@ -18,10 +20,11 @@ fn run(filename: &str) -> Result<(), ImageError> {
 }
 
 fn plot_histogram(histogram: &[i32]) {
-    println!("{:?}", histogram);
+    // resample histogram from 256 to 128 bins to fit on the screen
+    let histogram: Vec<i32> =
+        histogram.iter().chunks(2).into_iter().map(|chunk| chunk.sum::<i32>() / 2).collect();
     let max = histogram.iter().max().unwrap();
-    // TODO: resampling
-    let bars: Vec<i32> = histogram.iter().take(128).map(|x| HISTOGRAM_HEIGHT * x / max).collect();
+    let bars: Vec<i32> = histogram.iter().map(|x| HISTOGRAM_HEIGHT * x / max).collect();
     for row in 0..HISTOGRAM_HEIGHT + 1 {
         let mut line = String::with_capacity(histogram.len());
         for bar in &bars {
