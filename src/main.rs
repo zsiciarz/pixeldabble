@@ -19,17 +19,21 @@ fn run(filename: &str) -> Result<(), ImageError> {
         green_histogram[g as usize] += 1;
         blue_histogram[b as usize] += 1;
     }
-    plot_histogram(&red_histogram);
-    plot_histogram(&green_histogram);
-    plot_histogram(&blue_histogram);
+    let max = red_histogram.iter()
+        .chain(green_histogram.iter())
+        .chain(blue_histogram.iter())
+        .max()
+        .unwrap();
+    plot_histogram(&red_histogram, *max);
+    plot_histogram(&green_histogram, *max);
+    plot_histogram(&blue_histogram, *max);
     Ok(())
 }
 
-fn plot_histogram(histogram: &[i32]) {
+fn plot_histogram(histogram: &[i32], max: i32) {
     // resample histogram from 256 to 128 bins to fit on the screen
     let histogram: Vec<i32> =
-        histogram.iter().chunks(2).into_iter().map(|chunk| chunk.sum::<i32>() / 2).collect();
-    let max = histogram.iter().max().unwrap();
+        histogram.iter().chunks(2).into_iter().map(|chunk| chunk.sum()).collect();
     let bars: Vec<i32> = histogram.iter().map(|x| HISTOGRAM_HEIGHT * x / max).collect();
     for row in 0..HISTOGRAM_HEIGHT + 1 {
         let mut line = String::with_capacity(histogram.len());
