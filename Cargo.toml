@@ -6,3 +6,4 @@ authors = ["Zbigniew Siciarz <zbigniew@siciarz.net>"]
 [dependencies]
 image = "0.11.0"
 itertools = "0.5.8"
+term = "0.4.4"

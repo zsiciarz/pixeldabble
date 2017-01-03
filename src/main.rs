@@ -1,5 +1,6 @@
 extern crate image;
 extern crate itertools;
+extern crate term;
 
 use image::{GenericImage, ImageError, Pixel};
 use itertools::Itertools;
@@ -24,17 +25,19 @@ fn run(filename: &str) -> Result<(), ImageError> {
         .chain(blue_histogram.iter())
         .max()
         .unwrap();
-    plot_histogram(&red_histogram, *max);
-    plot_histogram(&green_histogram, *max);
-    plot_histogram(&blue_histogram, *max);
+    plot_histogram(&red_histogram, *max, term::color::BRIGHT_RED);
+    plot_histogram(&green_histogram, *max, term::color::BRIGHT_GREEN);
+    plot_histogram(&blue_histogram, *max, term::color::BRIGHT_BLUE);
     Ok(())
 }
 
-fn plot_histogram(histogram: &[i32], max: i32) {
+fn plot_histogram(histogram: &[i32], max: i32, color: term::color::Color) {
     // resample histogram from 256 to 128 bins to fit on the screen
     let histogram: Vec<i32> =
         histogram.iter().chunks(2).into_iter().map(|chunk| chunk.sum()).collect();
     let bars: Vec<i32> = histogram.iter().map(|x| HISTOGRAM_HEIGHT * x / max).collect();
+    let mut t = term::stdout().unwrap();
+    t.fg(color).unwrap();
     for row in 0..HISTOGRAM_HEIGHT + 1 {
         let mut line = String::with_capacity(histogram.len());
         for bar in &bars {
@@ -46,6 +49,7 @@ fn plot_histogram(histogram: &[i32], max: i32) {
         }
         println!("{}", line);
     }
+    t.reset().unwrap();
 }
 
 fn main() {
