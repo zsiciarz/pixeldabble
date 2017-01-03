@@ -1,3 +1,10 @@
+fn run() -> Result<(), String> {
+    Ok(())
+}
+
 fn main() {
-    println!("Hello, world!");
+    if let Err(ref e) = run() {
+        println!("error: {}", e);
+        std::process::exit(1);
+    }
 }
