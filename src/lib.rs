@@ -1,14 +1,20 @@
+#[macro_use]
+extern crate error_chain;
 extern crate image;
 extern crate itertools;
 extern crate term;
 
-use image::{GenericImage, ImageError, Pixel};
+use image::{GenericImage, Pixel};
 use itertools::Itertools;
+
+mod errors;
+
+use errors::*;
 
 const HISTOGRAM_HEIGHT: i32 = 16;
 
-pub fn run(filename: &str) -> Result<(), ImageError> {
-    let img = image::open(filename)?;
+pub fn run(filename: &str) -> Result<()> {
+    let img = image::open(filename).chain_err(|| "failed to open image")?;
     let (width, height) = img.dimensions();
     println!("{}: {}x{} px", filename, width, height);
     let mut red_histogram = vec![0; 256];

@@ -7,6 +7,13 @@ fn main() {
     });
     if let Err(ref e) = pixeldabble::run(&image_file[..]) {
         println!("error: {}", e);
-        std::process::exit(1);
+        for e in e.iter().skip(1) {
+            println!("caused by: {}", e);
+        }
+        if let Some(backtrace) = e.backtrace() {
+            println!("backtrace: {:?}",
+                     backtrace);
+        }
+        ::std::process::exit(1);
     }
 }
