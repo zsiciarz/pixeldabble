@@ -30,20 +30,20 @@ pub fn run(filename: &str) -> Result<()> {
         .chain(green_histogram.iter())
         .chain(blue_histogram.iter())
         .max()
-        .unwrap();
-    plot_histogram(&red_histogram, *max, term::color::BRIGHT_RED);
-    plot_histogram(&green_histogram, *max, term::color::BRIGHT_GREEN);
-    plot_histogram(&blue_histogram, *max, term::color::BRIGHT_BLUE);
+        .ok_or("failed to find max value")?;
+    plot_histogram(&red_histogram, *max, term::color::BRIGHT_RED)?;
+    plot_histogram(&green_histogram, *max, term::color::BRIGHT_GREEN)?;
+    plot_histogram(&blue_histogram, *max, term::color::BRIGHT_BLUE)?;
     Ok(())
 }
 
-fn plot_histogram(histogram: &[i32], max: i32, color: term::color::Color) {
+fn plot_histogram(histogram: &[i32], max: i32, color: term::color::Color) -> Result<()> {
     // resample histogram from 256 to 128 bins to fit on the screen
     let histogram: Vec<i32> =
         histogram.iter().chunks(2).into_iter().map(|chunk| chunk.sum()).collect();
     let bars: Vec<i32> = histogram.iter().map(|x| HISTOGRAM_HEIGHT * x / max).collect();
-    let mut t = term::stdout().unwrap();
-    t.fg(color).unwrap();
+    let mut t = term::stdout().ok_or("failed to access stdout")?;
+    t.fg(color).chain_err(|| "failed to set font color")?;
     for row in 0..HISTOGRAM_HEIGHT + 1 {
         let mut line = String::with_capacity(histogram.len());
         for bar in &bars {
@@ -55,5 +55,6 @@ fn plot_histogram(histogram: &[i32], max: i32, color: term::color::Color) {
         }
         println!("{}", line);
     }
-    t.reset().unwrap();
+    t.reset().chain_err(|| "failed to reset stdout")?;
+    Ok(())
 }
