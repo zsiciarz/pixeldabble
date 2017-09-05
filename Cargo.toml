@@ -6,5 +6,5 @@ authors = ["Zbigniew Siciarz <zbigniew@siciarz.net>"]
 [dependencies]
 error-chain = "0.10.0"
 image = "0.15.0"
-itertools = "0.6.1"
+itertools = "0.6.2"
 term = "0.4.6"
